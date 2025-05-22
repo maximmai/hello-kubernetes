@@ -4,11 +4,19 @@
 <div id="info">
   <table>
       <tr>
+          <th>requested resource:</th>
+          <td>{{ fullUrl }}</td>
+      </tr>
+      <tr>
+          <th>request ip:</th>
+          <td>{{ requestIp }}</td>
+      </tr>
+      <tr>
           <th>request id:</th>
           <td>{{ requestId }}</td>
       </tr>
       <tr>
-          <td>timestamp:</td>
+          <th>timestamp:</th>
           <td>{{ requestTimestamp }}</td>
       </tr>
   </table>

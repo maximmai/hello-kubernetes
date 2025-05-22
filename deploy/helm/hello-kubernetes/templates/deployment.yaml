@@ -15,6 +15,8 @@ spec:
         {{- include "hello-kubernetes.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "hello-kubernetes.name" . }}
+      imagePullSecrets:
+        - name: "{{ .Values.deployment.imagePullSecret }}"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.deployment.container.image.repository }}:{{ .Values.deployment.container.image.tag | default .Chart.AppVersion }}"

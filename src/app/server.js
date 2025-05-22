@@ -16,26 +16,26 @@ app.set('view engine', 'handlebars');
 
 // Configuration
 
-var port = process.env.PORT || 8080;
-var message = process.env.MESSAGE || 'Hello world!';
-var renderPathPrefix = (
-  process.env.RENDER_PATH_PREFIX ? 
-    '/' + process.env.RENDER_PATH_PREFIX.replace(/^[\\/]+/, '').replace(/[\\/]+$/, '') :
-    ''
+const port = process.env.PORT || 8080;
+const message = process.env.MESSAGE || 'Hello world!';
+const renderPathPrefix = (
+    process.env.RENDER_PATH_PREFIX ?
+        '/' + process.env.RENDER_PATH_PREFIX.replace(/^[\\/]+/, '').replace(/[\\/]+$/, '') :
+        ''
 );
-var handlerPathPrefix = (
-  process.env.HANDLER_PATH_PREFIX ? 
-    '/' + process.env.HANDLER_PATH_PREFIX.replace(/^[\\/]+/, '').replace(/[\\/]+$/, '') :
-    ''
+const handlerPathPrefix = (
+    process.env.HANDLER_PATH_PREFIX ?
+        '/' + process.env.HANDLER_PATH_PREFIX.replace(/^[\\/]+/, '').replace(/[\\/]+$/, '') :
+        ''
 );
 
-var namespace = process.env.KUBERNETES_NAMESPACE || '-';
-var podName = process.env.KUBERNETES_POD_NAME || os.hostname();
-var nodeName = process.env.KUBERNETES_NODE_NAME || '-';
-var nodeOS = os.type() + ' ' + os.release();
-var applicationVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
-var containerImage = process.env.CONTAINER_IMAGE || 'fastdns/hello-kubernetes:' + applicationVersion
-var containerImageArch = JSON.parse(fs.readFileSync('info.json', 'utf8')).containerImageArch;
+const namespace = process.env.KUBERNETES_NAMESPACE || '-';
+const podName = process.env.KUBERNETES_POD_NAME || os.hostname();
+const nodeName = process.env.KUBERNETES_NODE_NAME || '-';
+const nodeOS = os.type() + ' ' + os.release();
+const applicationVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
+const containerImage = process.env.CONTAINER_IMAGE || 'fastdns/hello-kubernetes:' + applicationVersion;
+const containerImageArch = JSON.parse(fs.readFileSync('info.json', 'utf8')).containerImageArch;
 
 logger.debug();
 logger.debug('Configuration');
@@ -63,13 +63,14 @@ app.use(handlerPathPrefix, express.static('static'))
 app.use((req, res, next) => {
     req.requestId = uuid.v4(); // Assign a unique ID to the request
     req.timestamp = new Date().toISOString();
+    logger.debug('Request IP' + req.ip);
     next();
 });
 
 
 logger.debug('Handler: /');
 logger.debug('Serving from base path "' + handlerPathPrefix + '"');
-app.get(handlerPathPrefix + '/', function (req, res) {
+app.get(handlerPathPrefix + '/*', function (req, res) {
     res.render('home', {
       message: message,
       requestId: req.requestId,
@@ -78,7 +79,9 @@ app.get(handlerPathPrefix + '/', function (req, res) {
       pod: podName,
       node: nodeName + ' (' + nodeOS + ')',
       container: containerImage + ' (' + containerImageArch + ')',
-      renderPathPrefix: renderPathPrefix
+      renderPathPrefix: renderPathPrefix,
+      requestIp: req.ip,
+      fullUrl: req.protocol + '://' + req.get('host') + req.originalUrl,
     });
 });
 

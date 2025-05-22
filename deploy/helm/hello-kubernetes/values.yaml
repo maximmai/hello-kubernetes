@@ -12,13 +12,14 @@ service:
   port: 80
 
 deployment:
-  replicaCount: 2
+  replicaCount: 1
   container:
     image:
-      repository: "paulbouwer/hello-kubernetes"
-      tag: "" # uses chart appVersion if not provided
-      pullPolicy: IfNotPresent
+      repository: "registry.fastdns.io/fastdns/hello-kubernetes"
+      tag: "1.1.1" # uses chart appVersion if not provided
+      pullPolicy: Always
     port: 8080
+  imagePullSecret: regcred
 
   # Currently only linux images on amd64 architecture are supported - support for arm64 and windows/amd64 coming ...
   nodeSelector:
